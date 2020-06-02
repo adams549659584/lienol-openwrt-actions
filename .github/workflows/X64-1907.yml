@@ -22,7 +22,7 @@ on:
     types: started
 
 env:
-  REPO_URL: https://github.com/Lienol/openwrt
+  REPO_URL: https://github.com/adams549659584/lienol-openwrt
   REPO_BRANCH: dev-19.07
   CONFIG_FILE: X64-1907.config
   DIY_SH: diy.sh
