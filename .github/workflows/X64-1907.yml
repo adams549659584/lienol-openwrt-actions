@@ -59,9 +59,7 @@ jobs:
     
     - name: Custom configure file
       run: |
-          cd openwrt
-          rm -f .config
-          cp ../$CONFIG_FILE .config
+        [ -e $CONFIG_FILE ] && mv $CONFIG_FILE openwrt/.config
           
     - name: Make Defconfig
       run: |
