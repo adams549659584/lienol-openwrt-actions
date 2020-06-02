@@ -8,15 +8,31 @@
 name: X64-1907
 
 on:
-  schedule:
-    - cron: 0 20 * * *
-#  push:
-#    branches: 
-#      - master
+  repository_dispatch:
+  release:
+    types: published
+  push:
+    branches:
+      - master
+    paths:
+      - 'x86.config'
+#  schedule:
+#    - cron: 0 8 * * 5
+  watch:
+    types: started
+
+env:
+  REPO_URL: https://github.com/Lienol/openwrt
+  REPO_BRANCH: dev-19.07
+  FEEDS_CONF: feeds.conf.default
+  CONFIG_FILE: X64-1907.config
+  TZ: Asia/Shanghai
+
 
 jobs:
   build:
     runs-on: ubuntu-latest
+    if: github.event.repository.owner.id == github.event.sender.id
 
     steps:
     - name: Initialization environment
@@ -30,17 +46,10 @@ jobs:
           sudo ln -sf /usr/share/zoneinfo/Asia/Shanghai /etc/localtime
           sudo -E apt-get -y autoremove --purge
           sudo -E apt-get clean
+          sudo timedatectl set-timezone "$TZ"
           
     - name: Clone source code
-      env: 
-        REPO_URL: https://github.com/Lienol/openwrt
-        REPO_BRANCH: dev-19.07
       run: git clone --depth 1 $REPO_URL -b $REPO_BRANCH openwrt
-      
-    - name: Clone Config
-      env: 
-        REPO_URL: https://github.com/Lienol/openwrt-actions
-      run: git clone --depth 1 $REPO_URL openwrt-config
       
     - name: Update feeds
       run: cd openwrt && ./scripts/feeds update -a
@@ -52,7 +61,7 @@ jobs:
       run: |
           cd openwrt
           rm -f .config
-          cp ../openwrt-config/x64-1907 .config
+          cp ../$CONFIG_FILE .config
           
     - name: Make Defconfig
       run: |
